@@ -89,7 +89,7 @@ private:
 				if(!equal)
 					break;
 				items temp = curr_data[i];
-				temp.insert(*(prev(curr_data[j].end())));
+				temp.insert(*prev(curr_data[j].end()));
 				if(!has_infrequent(temp, curr_data))
 					res.push_back(temp);
 			}
