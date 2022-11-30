@@ -17,12 +17,12 @@ private:
 
 public:
 	/* Constructor */
-	LinearRegression(vector<pair<double, double>> data) {
+	explicit LinearRegression(const vector<pair<double, double>>& data) {
 		this->data = data;
 		this->slope = 0;
 		this->intercept = 0;
 	}
-
+	
 	/* Fits the regressor to the dataset */
 	void fit() {
 		int size = data.size();
@@ -42,16 +42,16 @@ public:
 		this->intercept = (numerator / denominator);
 		this->slope = (y_mean - this->intercept) / x_mean;
 	}
-
+	
 	/* Returns the predicted vector */
-	vector<double> predict(vector<double> x) {
+	vector<double> predict(const vector<double>& x) const {
 		vector<double> y_hat;
 		for(auto xi : x)
 			y_hat.push_back((this->slope * xi) + (this->intercept));
 		return y_hat;
 	}
-
-	/* Returns the sqaured sum error on the given data */
+	
+	/* Returns the squared sum error on the given data */
 	double squared_sum_error() {
 		double res = 0;
 		vector<double> y_hat;
@@ -64,9 +64,9 @@ public:
 		}
 		return res;
 	}
-
+	
 	/* Prints the line equation */
-	void line_equation() {
+	void line_equation() const {
 		cout<<"y = ";
 		if(!this->intercept && !this->slope) {
 			cout<<"0\n";
@@ -86,7 +86,7 @@ public:
 		}
 		else cout<<"\n";
 	}
-
+	
 	/* Plots the data points */
 	void plot() {
 		auto temp = data;
@@ -138,24 +138,24 @@ int main() {
 	for(int i = 0; i < size; i++) {
 		double x, y;
 		cin>>x>>y;
-		data.push_back({x, y});
+		data.emplace_back(x, y);
 	}
-
+	
 	/* Initializing and fitting the regressor on the data */
 	LinearRegression tool(data);
 	tool.fit();
-
+	
 	/* Printing the line equation obtained */
 	cout<<"Line Equation: ";
 	tool.line_equation();
-
+	
 	/* Printing the squared sum error */
 	cout<<"Squared Sum Error: "<<tool.squared_sum_error()<<'\n';
-
+	
 	/* Plotting the graph */
 	cout<<"Plotted Graph:\n";
 	tool.plot();
-
+	
 	/* Taking input for prediction */
 	cout<<"Enter the number of x values to be predicted:";
 	cin>>size;
@@ -166,11 +166,11 @@ int main() {
 		cin>>bin;
 		x_vector.push_back(bin);
 	}
-
+	
 	/* Predicting and printing the values */
 	vector<double> y_hat = tool.predict(x_vector);
 	cout<<"Predicted values:\n";
 	for(int i = 0; i < size; i++) cout<<x_vector[i]<<" : "<<y_hat[i]<<'\n';
-
+	
 	return 0;
 }
