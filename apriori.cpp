@@ -8,7 +8,6 @@ private:
 	vector<items> dataset;
 	items unique_items;
 	unordered_map<string, int> freq_map;
-	map<vector<string>, vector<int>> present_indices;
 	int threshold_support = -1;
 	double threshold_confidence = -1.0;
 	vector<items> max_freq_item_set;
