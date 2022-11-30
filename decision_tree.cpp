@@ -15,9 +15,9 @@ private:
 		public:
 			unordered_map<string, DecisionTreeNode*> children;
 			int feature;
-
+			
 			/* Constructors */
-			DecisionTreeInternalNode(int feature) : feature(feature) {}
+			explicit DecisionTreeInternalNode(int feature) : feature(feature) {}
 			DecisionTreeInternalNode() : feature(-1) {}
 		};
 		
@@ -25,22 +25,22 @@ private:
 		class DecisionTreeLeafNode {
 		public:
 			string class_name;
-
+			
 			/* Constructors */
-			DecisionTreeLeafNode(string  name) : class_name(std::move(name)) {}
+			explicit DecisionTreeLeafNode(string  name) : class_name(std::move(name)) {}
 			DecisionTreeLeafNode() = default;
 		};
 		
 		bool is_leaf; /* Boolean to check if it is a leaf node */
 		DecisionTreeInternalNode internal_node;
 		DecisionTreeLeafNode leaf_node;
-
+		
 		/* Constructors */
-		DecisionTreeNode(const DecisionTreeInternalNode& internal_node) {
+		explicit DecisionTreeNode(const DecisionTreeInternalNode& internal_node) {
 			this->internal_node = internal_node;
 			this->is_leaf = false;
 		}
-		DecisionTreeNode(const DecisionTreeLeafNode& leaf_node) {
+		explicit DecisionTreeNode(const DecisionTreeLeafNode& leaf_node) {
 			this->leaf_node = leaf_node;
 			this->is_leaf = true;
 		}
@@ -49,12 +49,18 @@ private:
 	/* Defining internal and leaf node types */
 	typedef DecisionTreeNode::DecisionTreeInternalNode Internal;
 	typedef DecisionTreeNode::DecisionTreeLeafNode Leaf;
-
+	
+	/* Returns a set containing the unique values of a feature */
+	set<string> distinct_values(int feature, const set<int>& tuples) {
+		set<string> result;
+		for(const auto& i : tuples) result.insert(dataset[i][feature]);
+		return result;
+	}
+	
 	/* Calculates the total information in the given tuples */
 	double information(const set<int>& tuples) {
-		set<string> unique_values;
 		int size = (int)dataset[0].size();
-		for(auto i : tuples) unique_values.insert(dataset[i][size - 1]);
+		set<string> unique_values = distinct_values(size - 1, tuples);
 		vector<double> probability(unique_values.size(), 0);
 		int index = 0;
 		for(const auto& v : unique_values) {
@@ -88,15 +94,14 @@ private:
 	
 	/* Calculates the information of the feature */
 	double leftover_info(int feature, const set<int>& tuples) {
-		set<string> unique_values;
-		for(auto i : tuples) unique_values.insert(dataset[i][feature]);
+		set<string> unique_values = distinct_values(feature, tuples);
 		int total = (int)tuples.size();
 		double result = 0;
 		for(const auto& v : unique_values)
 			result += (entropy_of_value(feature, v, tuples) / total);
 		return result;
 	}
-
+	
 	/* Selects the best feature at an internal node */
 	int select_best_feature(const set<int>& features, const set<int>& tuples) {
 		double min_leftover_info = INT_MAX;
@@ -110,15 +115,14 @@ private:
 		}
 		return result;
 	}
-
+	
 	/* Checks if all the tuples belong to the same class */
 	string has_impurity(const set<int>& tuples) {
-		set<string> unique_values;
 		int size = (int)dataset[0].size();
-		for(auto i : tuples) unique_values.insert(dataset[i][size - 1]);
+		set<string> unique_values = distinct_values(size - 1, tuples);
 		return ((unique_values.size() > 1) ? "" : *unique_values.begin());
 	}
-
+	
 	/* Returns the most frequent class in the remaining tuples */
 	string majority_class(const set<int>& tuples) {
 		unordered_map<string, int> frequency;
@@ -132,13 +136,6 @@ private:
 				result = p.first;
 			}
 		}
-		return result;
-	}
-	
-	/* Returns a set containing the unique values of a feature */
-	set<string> distinct_values(int feature, const set<int>& tuples) {
-		set<string> result;
-		for(const auto& i : tuples) result.insert(dataset[i][feature]);
 		return result;
 	}
 	
@@ -180,10 +177,10 @@ private:
 	
 	/* Decision tree head node */
 	DecisionTreeNode* head_node{};
-	
+
 public:
 	/* Constructor */
-	DecisionTreeClassifier(const vector<vector<string>>& data) : dataset(data) {}
+	explicit DecisionTreeClassifier(const vector<vector<string>>& data) : dataset(data) {}
 	
 	/* Calls the recursive construct function */
 	void construct() {
